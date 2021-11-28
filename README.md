@@ -1,3 +1,9 @@
+# G15
+
+A fork of the SIMH framework for development of a Bendix G15 simulator.
+
+![G15X-1](https://user-images.githubusercontent.com/1750488/143665817-2eb2102b-5a3e-4f2a-b726-0a610e65e14f.png)
+
 # SIMH v4.0 - 19-01 Current
 
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/11982/badge.svg)](https://scan.coverity.com/projects/simh)
@@ -98,7 +104,7 @@
 
 #### CDC 1700 simulator from John Forecast
 
-#### Hans-Åke Lund has implemented an SCELBI (SCientic-ELectronics-BIology) simulator.
+#### Hans-Ã…ke Lund has implemented an SCELBI (SCientic-ELectronics-BIology) simulator.
 
 #### IBM 650 simulator from Roberto Sancho Villa
 
