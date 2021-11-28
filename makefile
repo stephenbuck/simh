@@ -1784,6 +1784,15 @@ LGP = ${LGPD}/lgp_cpu.c ${LGPD}/lgp_stddev.c ${LGPD}/lgp_sys.c
 LGP_OPT = -I ${LGPD}
 
 
+G15D = ${SIMHD}/G15
+G15 = ${G15D}/g15_an1.c ${G15D}/g15_at1.c ${G15D}/g15_ca1.c \
+	${G15D}/g15_ca2.c ${G15D}/g15_cpu.c ${G15D}/g15_ctl.c \
+	${G15D}/g15_da1.c ${G15D}/g15_drum.c ${G15D}/g15_mta2.c \
+	${G15D}/g15_pa3.c ${G15D}/g15_pr1.c ${G15D}/g15_pr2.c \
+	${G15D}/g15_ptp1.c ${G15D}/g15_sys.c ${G15D}/g15_util.c 
+G15_OPT = -I ${G15D}
+
+
 SDSD = ${SIMHD}/SDS
 SDS = ${SDSD}/sds_cpu.c ${SDSD}/sds_drm.c ${SDSD}/sds_dsk.c ${SDSD}/sds_io.c \
 	${SDSD}/sds_lp.c ${SDSD}/sds_mt.c ${SDSD}/sds_mux.c ${SDSD}/sds_rad.c \
@@ -2115,7 +2124,7 @@ ALL = pdp1 pdp4 pdp7 pdp8 pdp9 pdp15 pdp11 pdp10 \
 	vaxstation3100m30 vaxstation3100m38 vaxstation3100m76 vaxstation4000m60 \
 	microvax3100m80 vaxstation4000vlc infoserver1000 \
 	nova eclipse hp2100 hp3000 i1401 i1620 s3 altair altairz80 gri \
-	i7094 ibm1130 id16 id32 sds lgp h316 cdc1700 \
+	i7094 ibm1130 id16 id32 sds lgp g15 h316 cdc1700 \
 	swtp6800mp-a swtp6800mp-a2 tx-0 ssem b5500 intel-mds \
 	scelbi 3b2 i701 i704 i7010 i7070 i7080 i7090 \
 	sigma uc15 pdp10-ka pdp10-ki pdp10-kl pdp6 i650
@@ -2582,6 +2591,15 @@ ${BIN}lgp${EXE} : ${LGP} ${SIM}
 	${CC} ${LGP} ${SIM} ${LGP_OPT} ${CC_OUTSPEC} ${LDFLAGS}
 ifneq (,$(call find_test,${LGPD},lgp))
 	$@ $(call find_test,${LGPD},lgp) ${TEST_ARG}
+endif
+
+g15 : ${BIN}g15${EXE}
+
+${BIN}g15${EXE} : ${G15} ${SIM}
+	${MKDIRBIN}
+	${CC} ${G15} ${SIM} ${G15_OPT} ${CC_OUTSPEC} ${LDFLAGS}
+ifneq (,$(call find_test,${G15D},g15))
+	$@ $(call find_test,${G15D},g15) ${TEST_ARG}
 endif
 
 id16 : ${BIN}id16${EXE}
