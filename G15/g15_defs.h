@@ -34,10 +34,13 @@
 #error "G15 does not support 64b values!"
 #endif
 
+<<<<<<< HEAD
 #define STOP_RSRV       1                               /* Must be 1 */
 #define STOP_HALT       2                               /* Halt */
 #define STOP_IBKPT      3                               /* Breakpoint */
 
+=======
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 typedef enum {
     READ_COMMAND,
     WAIT_TO_EXECUTE,
@@ -89,8 +92,13 @@ void g15_util_trace_print(const char * message);
 typedef struct
 {
     bool     halt;
+<<<<<<< HEAD
     uint8_t  line;
     uint8_t  next;
+=======
+    size_t   line;
+    size_t   next;
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
     unsigned AR;
     unsigned ID;
     unsigned MQ;

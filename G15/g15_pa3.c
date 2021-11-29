@@ -15,7 +15,11 @@ MTAB g15_pa3_mod[] =
 
 DEVICE g15_pa3_dev =
 {
+<<<<<<< HEAD
     name:        "PA-3",
+=======
+    name:        "PA3",
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
     units:       g15_pa3_unit,
     registers:   g15_pa3_reg,
     modifiers:   g15_pa3_mod,
@@ -27,7 +31,11 @@ const char *g15_pa3_desc(DEVICE *dptr)
     return "Graph Plotter";
 }
 
+<<<<<<< HEAD
 t_stat g15_pa3_svc(UNIT *uptr)
+=======
+t_stat g15_pa3_svc(UINT *uptr)
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 {
     return SCPE_OK;
 }

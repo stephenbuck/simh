@@ -5,6 +5,7 @@
 
 typedef void (*G15_FUNC)(G15_CNTX * cntx, G15_INST inst);
 
+<<<<<<< HEAD
 
 static G15_CNTX g15_cpu_cntx =
 {
@@ -21,6 +22,8 @@ static G15_CNTX g15_cpu_cntx =
 const char *g15_cpu_desc(DEVICE *dptr);
 t_stat g15_cpu_reset(DEVICE *dptr);
 
+=======
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 static void tbd(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
@@ -536,23 +539,32 @@ static G15_FUNC g15_cpu_dec[32][32] =
 
 UNIT g15_cpu_unit[] =
 {
+<<<<<<< HEAD
     { UDATA (NULL, UNIT_FIX, 4096) },
     { NULL }
+=======
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 };
 
 REG g15_cpu_reg[] =
 {
+<<<<<<< HEAD
     { HRDATAD (AR, g15_cpu_cntx.AR, 32, "AR Register") },
     { HRDATAD (ID, g15_cpu_cntx.ID, 32, "ID Register") },
     { HRDATAD (MQ, g15_cpu_cntx.MQ, 32, "MQ Register") },
     { HRDATAD (PN, g15_cpu_cntx.PN, 32, "PN Register") },
     { HRDATAD (IP, g15_cpu_cntx.IP, 32, "IP Register") },
     { NULL }
+=======
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 };
 
 MTAB g15_cpu_mod[] =
 {
+<<<<<<< HEAD
     { 0 }
+=======
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 };
 
 DEVICE g15_cpu_dev =
@@ -562,6 +574,7 @@ DEVICE g15_cpu_dev =
     registers:   g15_cpu_reg,
     modifiers:   g15_cpu_mod,
     numunits:    1,
+<<<<<<< HEAD
     aradix:      10,
     awidth:      31,
     aincr:       1,
@@ -585,6 +598,8 @@ DEVICE g15_cpu_dev =
     description: &g15_cpu_desc,
     brk_types:   NULL,
     type_ctx:    NULL
+=======
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 };
 
 const char *g15_cpu_desc(DEVICE *dptr)
@@ -592,6 +607,21 @@ const char *g15_cpu_desc(DEVICE *dptr)
     return "G15 CPU";
 }
 
+<<<<<<< HEAD
+=======
+static G15_CNTX g15_cpu_cntx =
+{
+    halt:  false,
+    line:  1,
+    next:  0,
+    AR:    0,
+    ID:    0,
+    MQ:    0,
+    PN:    0,
+    IP:    0
+};
+
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 t_stat g15_cpu_reset(DEVICE *dptr)
 {
     g15_cpu_cntx.halt = false;
@@ -603,8 +633,12 @@ t_stat g15_cpu_reset(DEVICE *dptr)
     g15_cpu_cntx.PN   = 0;
     g15_cpu_cntx.IP   = 0;
 
+<<<<<<< HEAD
     sim_brk_types = SWMASK('E') | SWMASK('M');
     sim_brk_dflt  = SWMASK('E');
+=======
+    sim_brk_types = sim_brk_dflt = SWMASK('M');
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
     
     return SCPE_OK;
 }
@@ -613,10 +647,16 @@ t_stat sim_instr(void)
 {
     t_stat reason = SCPE_OK;
 
+<<<<<<< HEAD
     int32 PC = 0;
 
     while (reason == SCPE_OK)
     {
+=======
+    while (reason == SCPE_OK)
+    {
+#if 0
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
         // If there's a clock timeout, then break
         if (sim_interval <= 0)
         {
@@ -627,15 +667,27 @@ t_stat sim_instr(void)
         }
 
         // If there's an execution breakpoint, then break
+<<<<<<< HEAD
         if (sim_brk_summ && sim_brk_test(PC, SWMASK ('E')))
+=======
+        if (sim_brk_summ && sim_brk_test(SC, SWMASK ('E')))
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
         {
             reason = STOP_IBKPT;
             break;
         }
+<<<<<<< HEAD
 
         G15_CNTX * cntx = &g15_cpu_cntx;
         G15_INST inst = g15_util_w2i(g15_drum_rd(cntx->line, cntx->next));
         sim_printf("cntx(line=%02u, next=%03u, AR=%04u), inst(P=%01u, L=%03u, C=%01u, S=%02u, D=%02u)\n", cntx->line, cntx->next, cntx->AR, inst.P, inst.L, inst.C, inst.S, inst.D);
+=======
+#endif
+
+        G15_CNTX * cntx = &g15_cpu_cntx;
+        G15_INST inst = g15_util_w2i(g15_drum_rd(cntx->line, cntx->next));
+        printf("cntx(line=%02u, next=%03u, AR=%04u), inst(P=%01u, L=%03u, C=%01u, S=%02u, D=%02u)\n", cntx->line, cntx->next, cntx->AR, inst.P, inst.L, inst.C, inst.S, inst.D);
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
         cntx->next = inst.N;
         (*g15_cpu_dec[inst.S][inst.D])(cntx, inst);
 
@@ -652,7 +704,11 @@ t_stat sim_instr(void)
 #if 0
 void main()
 {
+<<<<<<< HEAD
     sim_printf("G15\n");
+=======
+    printf("G15\n");
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 
     G15_INST prog[] =
     {
@@ -685,4 +741,8 @@ void main()
         sim_instr();
     }
 }
+<<<<<<< HEAD
 #endif
+=======
+#endif
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b

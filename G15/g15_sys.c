@@ -29,6 +29,7 @@
 
 extern DEVICE g15_cpu_dev;
 extern REG    g15_cpu_reg[];
+<<<<<<< HEAD
 extern DEVICE g15_an1_dev;
 extern DEVICE g15_at1_dev;
 extern DEVICE g15_ca1_dev;
@@ -40,6 +41,19 @@ extern DEVICE g15_pa3_dev;
 extern DEVICE g15_pr1_dev;
 extern DEVICE g15_pr2_dev;
 extern DEVICE g15_ptp1_dev;
+=======
+//extern DEVICE g15_an1_dev;
+//extern DEVICE g15_at1_dev;
+//extern DEVICE g15_ca1_dev;
+//extern DEVICE g15_ca2_dev;
+//extern DEVICE g15_ctl_dev;
+//extern DEVICE g15_da1_dev;
+//extern DEVICE g15_mta2_dev;
+//extern DEVICE g15_pa3_dev;
+//extern DEVICE g15_pr1_dev;
+//extern DEVICE g15_pr2_dev;
+//extern DEVICE g15_ptp1_dev;
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 
 /* SCP data structures and interface routines
 
@@ -60,6 +74,7 @@ int32 sim_emax = 1;
 DEVICE *sim_devices[] =
 {
     &g15_cpu_dev,
+<<<<<<< HEAD
     &g15_an1_dev,
     &g15_at1_dev,
     &g15_ca1_dev,
@@ -71,20 +86,40 @@ DEVICE *sim_devices[] =
     &g15_pr1_dev,
     &g15_pr2_dev,
     &g15_ptp1_dev,
+=======
+//    &g15_an1_dev,
+//    &g15_at1_dev,
+//    &g15_ca1_dev,
+//    &g15_ca2_dev,
+//    &g15_ctl_dev,
+//    &g15_da1_dev,
+//    &g15_mta2_dev,
+//    &g15_pa3_dev,
+//    &g15_pr1_dev,
+//    &g15_pr2_dev,
+//    &g15_ptp1_dev,
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
     NULL
 };
 
 const char *sim_stop_messages[SCPE_BASE] =
 {
     "Unknown error",
+<<<<<<< HEAD
     "Halt",
     "Breakpoint",
+=======
+    "STOP",
+    "Breakpoint",
+    "Arithmetic overflow"
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 };
 
 t_stat sim_load(FILE *fi, CONST char *cptr, CONST char *fnam, int flag)
 {
     return SCPE_OK;
 }
+<<<<<<< HEAD
 
 t_stat fprint_sym (FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
 {
@@ -95,3 +130,5 @@ t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
 {
     return SCPE_OK;
 }
+=======
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b

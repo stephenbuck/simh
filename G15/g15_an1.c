@@ -15,7 +15,11 @@ MTAB g15_an1_mod[] =
 
 DEVICE g15_an1_dev =
 {
+<<<<<<< HEAD
     name:        "AN-1",
+=======
+    name:        "AN1",
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
     units:       g15_an1_unit,
     registers:   g15_an1_reg,
     modifiers:   g15_an1_mod,
@@ -33,7 +37,11 @@ t_stat g15_an1_reset(DEVICE *dptr)
     return SCPE_OK;
 }
 
+<<<<<<< HEAD
 t_stat g15_an1_svc(UNIT *uptr)
+=======
+t_stat g15_an1_svc(UINT *uptr)
+>>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 {
     return SCPE_OK;
 }
