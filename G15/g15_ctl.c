@@ -64,11 +64,7 @@ t_stat g15_ctl_reset(DEVICE *dptr)
     return SCPE_OK;
 }
 
-<<<<<<< HEAD
 t_stat g15_ctl_svc(UNIT *uptr)
-=======
-t_stat g15_ctl_svc(UINT *uptr)
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 {
     return SCPE_OK;
 }

@@ -34,25 +34,24 @@
 #error "G15 does not support 64b values!"
 #endif
 
-<<<<<<< HEAD
-#define STOP_RSRV       1                               /* Must be 1 */
-#define STOP_HALT       2                               /* Halt */
-#define STOP_IBKPT      3                               /* Breakpoint */
+#define STOP_RSRV       1      // Must be 1 
+#define STOP_HALT       2      // Halt 
+#define STOP_IBKPT      3      // Breakpoint 
+#define STOP_INVINS     4      // Invalid Instruction
 
-=======
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 typedef enum {
-    READ_COMMAND,
-    WAIT_TO_EXECUTE,
-    EXECUTE,
-    WAIT_NEXT_COMMAND
+    G15_STATE_READ_COMMAND,
+    G15_STATE_WAIT_TO_EXECUTE,
+    G15_STATE_EXECUTE,
+    G15_STATE_WAIT_NEXT_COMMAND
 } G15_STATE;
 
 typedef enum {
+   PC,
+   AR,
    ID,
    PN,
-   MQ,
-   AR
+   MQ
 } G15_REGS;
 
 /*
@@ -72,12 +71,12 @@ typedef struct {
 
 typedef struct
 {
-    unsigned P:1;
-    unsigned L:7;
-    unsigned N:7;
-    unsigned S:5;
-    unsigned C:2;
-    unsigned D:5;
+    uint32_t P:1;
+    uint32_t L:7;
+    uint32_t N:7;
+    uint32_t S:5;
+    uint32_t C:2;
+    uint32_t D:5;
 
 } G15_INST;
 
@@ -91,19 +90,15 @@ void g15_util_trace_print(const char * message);
 
 typedef struct
 {
-    bool     halt;
-<<<<<<< HEAD
-    uint8_t  line;
-    uint8_t  next;
-=======
-    size_t   line;
-    size_t   next;
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
-    unsigned AR;
-    unsigned ID;
-    unsigned MQ;
-    unsigned PN;
-    unsigned IP;
+    G15_STATE state;
+    t_stat    reason;
+    bool      halt;
+    uint32_t  PC;
+    uint32_t  AR;
+    uint32_t  ID;
+    uint32_t  MQ;
+    uint32_t  PN;
+    uint32_t  IP;
 
 } G15_CNTX;
 
@@ -132,23 +127,23 @@ void     g15_drum_wr(uint8_t line, uint8_t word, uint32_t data);
 
 #define G15_AN1_CMD_TBD        0
 
-t_stat g15_an1_cmd(short cmd);
+t_stat g15_an1_cmd(uint16_t cmd);
 
 #define G15_AT1_CMD_TBD        0
 
-t_stat g15_at1_cmd(short cmd);
+t_stat g15_at1_cmd(uint16_t cmd);
 
 #define G15_CA1_CMD_TBD        0
 
-t_stat g15_ca1_cmd(short cmd);
+t_stat g15_ca1_cmd(uint16_t cmd);
 
 #define G15_CA2_CMD_TBD        0
 
-t_stat g15_ca2_cmd(short cmd);
+t_stat g15_ca2_cmd(uint16_t cmd);
 
 #define G15_DA1_CMD_TBD        0
 
-t_stat g15_da1_cmd(short cmd);
+t_stat g15_da1_cmd(uint16_t cmd);
 
 #define G15_MTA2_CMD_READ      0
 #define G15_MTA2_CMD_WRITE     1
@@ -156,22 +151,22 @@ t_stat g15_da1_cmd(short cmd);
 #define G15_MTA2_CMD_FORWARD   3
 #define G15_MTA2_CMD_REVERSE   4
 
-t_stat g15_mta2_cmd(short unit, short cmd);
+t_stat g15_mta2_cmd(uint16_t unit, uint16_t cmd);
 
 #define G15_PA3_CMD_READ       0
 
-t_stat g15_pa3_cmd(short cmd);
+t_stat g15_pa3_cmd(uint16_t cmd);
 
 #define G15_PR1_CMD_READ       0
 
-t_stat g15_pr1_cmd(short cmd);
+t_stat g15_pr1_cmd(uint16_t cmd);
 
 #define G15_PR2_CMD_READ       0
 
-t_stat g15_pr2_cmd(short cmd);
+t_stat g15_pr2_cmd(uint16_t cmd);
 
 #define G15_PTP1_CMD_WRITE     0
 
-t_stat g15_ptp1_cmd(short cmd);
+t_stat g15_ptp1_cmd(uint16_t cmd);
 
 #endif

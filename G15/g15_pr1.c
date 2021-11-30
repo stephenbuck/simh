@@ -100,7 +100,7 @@ const char *g15_pr1_desc(DEVICE *dptr)
     return "PR-1 Paper Tape Reader";
 }
 
-t_stat g15_pr1_cmd(short cmd)
+t_stat g15_pr1_cmd(uint16_t cmd)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_util_trace_leave();

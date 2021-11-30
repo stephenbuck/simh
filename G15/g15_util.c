@@ -29,22 +29,13 @@ G15_INST g15_util_w2i(unsigned word)
 
 void g15_util_trace_enter(const char * context)
 {
-<<<<<<< HEAD
     sim_printf("%s\n", context);
     sim_printf("{\n");
-=======
-    printf("%s\n", context);
-    printf("{\n");
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 }
 
 void g15_util_trace_leave()
 {
-<<<<<<< HEAD
     sim_printf("}\n");
-=======
-    printf("}\n");
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 }
 
 void g15_util_trace_print(const char * message)
@@ -104,8 +95,5 @@ static const uint8 flex_inp_valid[64] =
     0, 1, 1, 1, 0, 1, 1, 1,
     0, 1, 1, 1, 0, 1, 1, 1
 };
-<<<<<<< HEAD
 #endif
-=======
-#endif
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
+

@@ -15,11 +15,7 @@ MTAB g15_ptp1_mod[] =
 
 DEVICE g15_ptp1_dev =
 {
-<<<<<<< HEAD
     name:        "PTP-1",
-=======
-    name:        "ptp1",
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
     units:       g15_ptp1_unit,
     registers:   g15_ptp1_reg,
     modifiers:   g15_ptp1_mod,
@@ -47,11 +43,7 @@ t_stat g15_ptp1_detach(UNIT *uptr)
     return detach_unit(uptr);
 }
 
-<<<<<<< HEAD
 t_stat g15_ptp1_svc(UNIT *uptr)
-=======
-t_stat g15_ptp1_svc(UINT *uptr)
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 {
 #if 0
 if ((ptp_unit.flags & UNIT_ATT) == 0)                   /* attached? */
@@ -66,7 +58,7 @@ if (putc ((ptp_unit.buf & ((ptp_unit.flags & UNIT_8B)? 0377: 0177)), ptp_unit.fi
     return SCPE_OK;
 }
 
-t_stat g15_ptp1_cmd(short cmd)
+t_stat g15_ptp1_cmd(uint16_t cmd)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_util_trace_leave();

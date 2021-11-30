@@ -15,11 +15,7 @@ MTAB g15_da1_mod[] =
 
 DEVICE g15_da1_dev =
 {
-<<<<<<< HEAD
     name:        "DA-1",
-=======
-    name:        "DA1",
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
     units:       g15_da1_unit,
     registers:   g15_da1_reg,
     modifiers:   g15_da1_mod,
@@ -37,16 +33,12 @@ t_stat g15_da1_reset(DEVICE *dptr)
     return SCPE_OK;
 }
 
-<<<<<<< HEAD
 t_stat g15_da1_svc(UNIT *uptr)
-=======
-t_stat g15_da1_svc(UINT *uptr)
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 {
     return SCPE_OK;
 }
 
-t_stat g15_da1_cmd(short cmd)
+t_stat g15_da1_cmd(uint16_t cmd)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_util_trace_leave();

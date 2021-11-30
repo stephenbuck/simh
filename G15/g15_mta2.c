@@ -2,9 +2,6 @@
 #include "sim_tape.h"
 
 t_stat g15_mta2_reset(DEVICE *dptr);
-t_stat g15_mta2_boot(int32 unitno, DEVICE *dptr);
-t_stat g15_mta2_map_status(t_stat st);
-UNIT * g15_mta2_sel_unit(int32 unit);
 
 UNIT g15_mta2_unit[] =
 {
@@ -20,11 +17,7 @@ MTAB g15_mta2_mod[] =
 
 DEVICE g15_mta2_dev =
 {
-<<<<<<< HEAD
     "MTA-2",
-=======
-    "mta2-2",
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
     g15_mta2_unit,
     g15_mta2_reg,
     g15_mta2_mod,
@@ -37,7 +30,7 @@ DEVICE g15_mta2_dev =
     NULL,
     NULL,
     &g15_mta2_reset,
-    &g15_mta2_boot,
+    NULL,
     &sim_tape_attach,
     &sim_tape_detach,
     NULL,
@@ -54,7 +47,7 @@ t_stat g15_mta2_wr(int32 data, int32 PA, int32 access)
     return SCPE_OK;
 }
 
-t_stat g15_mta2_cmd(short unit, short cmd)
+t_stat g15_mta2_cmd(uint16_t unit, uint16_t cmd)
 {
     g15_util_trace_enter(__FUNCTION__);
     switch (cmd)
@@ -87,14 +80,6 @@ t_stat g15_mta2_reset(DEVICE *dptr)
     return SCPE_OK;
 }
 
-<<<<<<< HEAD
-t_stat g15_mta2_boot(int32 unitno, DEVICE *dptr)
-{
-    return SCPE_OK;
-}
-
-=======
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 t_stat g15_mta2_attach(UNIT *uptr, CONST char *cptr)
 {
     return SCPE_OK;
@@ -112,9 +97,5 @@ t_stat g15_mta2_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char 
 
 const char *g15_mta2_desc(DEVICE *dptr)
 {
-<<<<<<< HEAD
     return "MTA-2 Magnetic Tape Units";
-=======
-    return "mta2-2 Magnetic Tape Units";
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 }

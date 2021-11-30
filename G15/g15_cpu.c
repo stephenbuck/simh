@@ -3,27 +3,31 @@
 #include <math.h>
 #include "g15_defs.h"
 
+const char *g15_cpu_desc(DEVICE *dptr);
+t_stat g15_cpu_reset(DEVICE *dptr);
+t_stat g15_cpu_deposit(t_value val, t_addr addr, UNIT *uptr, int32 sw);
+t_stat g15_cpu_examine(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw);
+t_stat g15_cpu_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+
 typedef void (*G15_FUNC)(G15_CNTX * cntx, G15_INST inst);
 
-<<<<<<< HEAD
+#define PC_MAKE(ln,wd) (((ln) << 16) | ((wd) << 0))
+#define PC_LINE(pc)    (((pc) & 0xffff0000) >> 16)
+#define PC_WORD(pc)    (((pc) & 0x0000ffff) >>  0)
 
 static G15_CNTX g15_cpu_cntx =
 {
-    halt:  false,
-    line:  1,
-    next:  0,
-    AR:    0,
-    ID:    0,
-    MQ:    0,
-    PN:    0,
-    IP:    0
+    state:  G15_STATE_WAIT_NEXT_COMMAND,
+    reason: SCPE_OK,
+    halt:   false,
+    PC:     PC_MAKE(1, 0),
+    AR:     0,
+    ID:     0,
+    MQ:     0,
+    PN:     0,
+    IP:     0
 };
 
-const char *g15_cpu_desc(DEVICE *dptr);
-t_stat g15_cpu_reset(DEVICE *dptr);
-
-=======
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 static void tbd(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
@@ -368,7 +372,7 @@ static void stq(G15_CNTX * cntx, G15_INST inst)
 static void tng(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
-    if (cntx->AR < 0) cntx->next = inst.N + 1;
+    if (cntx->AR < 0) cntx->PC = PC_MAKE(PC_LINE(cntx->PC), inst.N + 1);
     g15_util_trace_leave();
 }
 
@@ -427,7 +431,7 @@ static void z03(G15_CNTX * cntx, G15_INST inst)
 static void tnz(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
-    if (cntx->AR != 0) cntx->next = inst.N + 1;
+    if (cntx->AR != 0) cntx->PC = PC_MAKE(PC_LINE(cntx->PC), inst.N + 1);
     g15_util_trace_leave();
 }
 
@@ -472,7 +476,7 @@ static void z00(G15_CNTX * cntx, G15_INST inst)
     {
         // Take next command from AR
         case 0:
-            cntx->next = cntx->AR; // BOZO
+            cntx->PC = PC_MAKE(PC_LINE(cntx->PC), cntx->AR); // BOZO
             break;
         // Copy number track into line 18
         case 1:
@@ -539,32 +543,23 @@ static G15_FUNC g15_cpu_dec[32][32] =
 
 UNIT g15_cpu_unit[] =
 {
-<<<<<<< HEAD
-    { UDATA (NULL, UNIT_FIX, 4096) },
-    { NULL }
-=======
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
+    UDATA (NULL, 0, 8)
 };
 
 REG g15_cpu_reg[] =
 {
-<<<<<<< HEAD
+    { HRDATAD (PC, g15_cpu_cntx.PC, 32, "PC Register") },
     { HRDATAD (AR, g15_cpu_cntx.AR, 32, "AR Register") },
     { HRDATAD (ID, g15_cpu_cntx.ID, 32, "ID Register") },
     { HRDATAD (MQ, g15_cpu_cntx.MQ, 32, "MQ Register") },
     { HRDATAD (PN, g15_cpu_cntx.PN, 32, "PN Register") },
     { HRDATAD (IP, g15_cpu_cntx.IP, 32, "IP Register") },
-    { NULL }
-=======
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
+    { NULL },
 };
 
 MTAB g15_cpu_mod[] =
 {
-<<<<<<< HEAD
     { 0 }
-=======
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 };
 
 DEVICE g15_cpu_dev =
@@ -574,14 +569,13 @@ DEVICE g15_cpu_dev =
     registers:   g15_cpu_reg,
     modifiers:   g15_cpu_mod,
     numunits:    1,
-<<<<<<< HEAD
-    aradix:      10,
+    aradix:      1,
     awidth:      31,
     aincr:       1,
-//    dradix:      DEV_RDX,
+    dradix:      1, // DEV_RDX,
     dwidth:      8,
-    examine:     NULL,
-    deposit:     NULL,
+    examine:     &g15_cpu_examine,
+    deposit:     &g15_cpu_deposit,
     reset:       &g15_cpu_reset,
     boot:        NULL,
     attach:      NULL,
@@ -590,16 +584,14 @@ DEVICE g15_cpu_dev =
     flags:       0,
     dctrl:       0,
     debflags:    NULL,
-//    memsize:     NULL,
+    msize:       NULL,
     lname:       NULL,
-    help:        NULL, // &g15_cpu_help,
+    help:        &g15_cpu_help,
     attach_help: NULL,
     help_ctx:    NULL,
     description: &g15_cpu_desc,
     brk_types:   NULL,
     type_ctx:    NULL
-=======
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 };
 
 const char *g15_cpu_desc(DEVICE *dptr)
@@ -607,39 +599,47 @@ const char *g15_cpu_desc(DEVICE *dptr)
     return "G15 CPU";
 }
 
-<<<<<<< HEAD
-=======
-static G15_CNTX g15_cpu_cntx =
-{
-    halt:  false,
-    line:  1,
-    next:  0,
-    AR:    0,
-    ID:    0,
-    MQ:    0,
-    PN:    0,
-    IP:    0
-};
-
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 t_stat g15_cpu_reset(DEVICE *dptr)
 {
-    g15_cpu_cntx.halt = false;
-    g15_cpu_cntx.line = 1;
-    g15_cpu_cntx.next = 0;
-    g15_cpu_cntx.AR   = 0;
-    g15_cpu_cntx.ID   = 0;
-    g15_cpu_cntx.MQ   = 0;
-    g15_cpu_cntx.PN   = 0;
-    g15_cpu_cntx.IP   = 0;
+    g15_cpu_cntx.state  = G15_STATE_WAIT_TO_EXECUTE;
+    g15_cpu_cntx.reason = SCPE_OK;
+    g15_cpu_cntx.halt   = false;
+    g15_cpu_cntx.PC     = PC_MAKE(1, 0);
+    g15_cpu_cntx.AR     = 0;
+    g15_cpu_cntx.ID     = 0;
+    g15_cpu_cntx.MQ     = 0;
+    g15_cpu_cntx.PN     = 0;
+    g15_cpu_cntx.IP     = 0;
 
-<<<<<<< HEAD
     sim_brk_types = SWMASK('E') | SWMASK('M');
     sim_brk_dflt  = SWMASK('E');
-=======
-    sim_brk_types = sim_brk_dflt = SWMASK('M');
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
     
+    return SCPE_OK;
+}
+
+t_stat g15_cpu_deposit(t_value val, t_addr addr, UNIT *uptr, int32 sw)
+{
+#if 0 
+    if (addr >= MEMSIZE)
+        return SCPE_NXM;
+    M[addr] = val & DMASK;
+#endif
+    return SCPE_OK;
+}
+
+t_stat g15_cpu_examine(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
+{
+#if 0
+    if (addr >= MEMSIZE)
+        return SCPE_NXM;
+    if (vptr != NULL)
+        *vptr = M[addr] & DMASK;
+#endif
+    return SCPE_OK;
+}
+
+t_stat g15_cpu_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
+{
     return SCPE_OK;
 }
 
@@ -647,16 +647,11 @@ t_stat sim_instr(void)
 {
     t_stat reason = SCPE_OK;
 
-<<<<<<< HEAD
+#if 0
     int32 PC = 0;
 
     while (reason == SCPE_OK)
     {
-=======
-    while (reason == SCPE_OK)
-    {
-#if 0
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
         // If there's a clock timeout, then break
         if (sim_interval <= 0)
         {
@@ -667,28 +662,16 @@ t_stat sim_instr(void)
         }
 
         // If there's an execution breakpoint, then break
-<<<<<<< HEAD
         if (sim_brk_summ && sim_brk_test(PC, SWMASK ('E')))
-=======
-        if (sim_brk_summ && sim_brk_test(SC, SWMASK ('E')))
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
         {
             reason = STOP_IBKPT;
             break;
         }
-<<<<<<< HEAD
 
         G15_CNTX * cntx = &g15_cpu_cntx;
-        G15_INST inst = g15_util_w2i(g15_drum_rd(cntx->line, cntx->next));
-        sim_printf("cntx(line=%02u, next=%03u, AR=%04u), inst(P=%01u, L=%03u, C=%01u, S=%02u, D=%02u)\n", cntx->line, cntx->next, cntx->AR, inst.P, inst.L, inst.C, inst.S, inst.D);
-=======
-#endif
-
-        G15_CNTX * cntx = &g15_cpu_cntx;
-        G15_INST inst = g15_util_w2i(g15_drum_rd(cntx->line, cntx->next));
-        printf("cntx(line=%02u, next=%03u, AR=%04u), inst(P=%01u, L=%03u, C=%01u, S=%02u, D=%02u)\n", cntx->line, cntx->next, cntx->AR, inst.P, inst.L, inst.C, inst.S, inst.D);
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
-        cntx->next = inst.N;
+        G15_INST inst = g15_util_w2i(g15_drum_rd(PC_LINE(cntx->PC), PC_WORD(cntx->PC)));
+        sim_printf("cntx(line=%02u, next=%03u, AR=%04u), inst(P=%01u, L=%03u, C=%01u, S=%02u, D=%02u)\n", PC_LINE(cntx->PC), PC_WORD(cntx->PC), cntx->AR, inst.P, inst.L, inst.C, inst.S, inst.D);
+        cntx->PC = PC_MAKE(PC_LINE(cntx->PC), inst.N);
         (*g15_cpu_dec[inst.S][inst.D])(cntx, inst);
 
         if (cntx->halt)
@@ -697,6 +680,7 @@ t_stat sim_instr(void)
             break;
         }
     }
+#endif
 
     return reason;
 }
@@ -704,11 +688,7 @@ t_stat sim_instr(void)
 #if 0
 void main()
 {
-<<<<<<< HEAD
     sim_printf("G15\n");
-=======
-    printf("G15\n");
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
 
     G15_INST prog[] =
     {
@@ -724,7 +704,7 @@ void main()
         g15_drum_wr(1, i, g15_util_i2w(prog[i]));
     }
 
-    unsigned data[] =
+    uint32_t data[] =
     {
         5,
         6
@@ -741,8 +721,4 @@ void main()
         sim_instr();
     }
 }
-<<<<<<< HEAD
 #endif
-=======
-#endif
->>>>>>> 5a6897ef325f6dfe1487cbfe81f715e6a457a04b
