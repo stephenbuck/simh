@@ -25,12 +25,15 @@ static G15_CNTX g15_cpu_cntx =
     ID:     0,
     MQ:     0,
     PN:     0,
-    IP:     0
+    IP:     0,
+    IO:     0,
+    OV:     0
 };
 
 static void tbd(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
+    cntx->reason = SCPE_UNK;
     g15_util_trace_leave();
 }
 
@@ -223,9 +226,11 @@ static void par(G15_CNTX * cntx, G15_INST inst)
     {
         // Print AR in numeric mode
         case 0:
+            g15_an1_cmd(G15_AN1_CMD_PRINT_AR_N);
             break;
         // Print AR in alphanumeric mode
         case 4:
+            g15_an1_cmd(G15_AN1_CMD_PRINT_AR_A);
             break;
     }
     g15_util_trace_leave();
@@ -235,7 +240,7 @@ static void par(G15_CNTX * cntx, G15_INST inst)
 static void pcr(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
-    g15_ca1_cmd(G15_CA1_CMD_TBD);
+    g15_ca1_cmd(G15_CA1_CMD_READ);
     g15_util_trace_leave();
 }
 
@@ -243,7 +248,7 @@ static void pcr(G15_CNTX * cntx, G15_INST inst)
 static void pcw(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
-    g15_ca1_cmd(G15_CA1_CMD_TBD);
+    g15_ca1_cmd(G15_CA1_CMD_WRITE);
     g15_util_trace_leave();
 }
 
@@ -262,9 +267,11 @@ static void pr9(G15_CNTX * cntx, G15_INST inst)
     {
         // Print line 19 in numeric mode
         case 0:
+            g15_an1_cmd(G15_AN1_CMD_PRINT_19_N);
             break;
         // Print line 19 in alphanumeric mode
         case 4:
+            g15_an1_cmd(G15_AN1_CMD_PRINT_19_A);
             break;
     }
     g15_util_trace_leave();
@@ -278,9 +285,11 @@ static void prm(G15_CNTX * cntx, G15_INST inst)
     {
         // Permit numeric type-in
         case 0:
+            g15_an1_cmd(G15_AN1_CMD_TYPE_IN_N);
             break;
         // Permit alphanumeric type-in
         case 4:
+            g15_an1_cmd(G15_AN1_CMD_TYPE_IN_A);
             break;
     }
     g15_util_trace_leave();
@@ -290,6 +299,7 @@ static void prm(G15_CNTX * cntx, G15_INST inst)
 static void pt9(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
+    g15_ptp1_cmd(G15_PTP1_CMD_PUNCH_19);
     g15_util_trace_leave();
 }
 
@@ -304,6 +314,7 @@ static void ptb(G15_CNTX * cntx, G15_INST inst)
 static void ptr(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
+    g15_pr1_cmd(G15_PR1_CMD_REVERSE);
     g15_util_trace_leave();
 }
 
@@ -338,9 +349,11 @@ static void spc(G15_CNTX * cntx, G15_INST inst)
     {
         // Halt
         case 16:
+            hlt(cntx, inst);
             break;
         // Ring bell
         case 17:
+            g15_bell_cmd(G15_BELL_CMD_RING);
             break;
     }
     g15_util_trace_leave();
@@ -439,6 +452,7 @@ static void tnz(G15_CNTX * cntx, G15_INST inst)
 static void tov(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
+    if (cntx->OV != 0) cntx->PC = PC_MAKE(PC_LINE(cntx->PC), inst.N + 1);
     g15_util_trace_leave();
 }
 
@@ -446,6 +460,7 @@ static void tov(G15_CNTX * cntx, G15_INST inst)
 static void try(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
+    if (cntx->IO != 0) cntx->PC = PC_MAKE(PC_LINE(cntx->PC), inst.N + 1);
     g15_util_trace_leave();
 }
 
@@ -493,9 +508,11 @@ static void z01(G15_CNTX * cntx, G15_INST inst)
     {
         // Ring bell
         case 0:
+            g15_bell_cmd(G15_BELL_CMD_RING);
             break;
         // Test for punch switch on
         case 1:
+            g15_ptp1_cmd(G15_PTP1_CMD_TEST_SW);
             break;
     }
     g15_util_trace_leave();
@@ -554,6 +571,8 @@ REG g15_cpu_reg[] =
     { HRDATAD (MQ, g15_cpu_cntx.MQ, 32, "MQ Register") },
     { HRDATAD (PN, g15_cpu_cntx.PN, 32, "PN Register") },
     { HRDATAD (IP, g15_cpu_cntx.IP, 32, "IP Register") },
+    { HRDATAD (OV, g15_cpu_cntx.OV, 32, "OV Register") },
+    { HRDATAD (IO, g15_cpu_cntx.IO, 32, "IO Register") },
     { NULL },
 };
 
@@ -610,9 +629,11 @@ t_stat g15_cpu_reset(DEVICE *dptr)
     g15_cpu_cntx.MQ     = 0;
     g15_cpu_cntx.PN     = 0;
     g15_cpu_cntx.IP     = 0;
+    g15_cpu_cntx.IO     = 0;
+    g15_cpu_cntx.OV     = 0;
 
-    sim_brk_types = SWMASK('E') | SWMASK('M');
     sim_brk_dflt  = SWMASK('E');
+    sim_brk_types = sim_brk_dflt | SWMASK('M');
     
     return SCPE_OK;
 }
@@ -623,6 +644,7 @@ t_stat g15_cpu_deposit(t_value val, t_addr addr, UNIT *uptr, int32 sw)
     if (addr >= MEMSIZE)
         return SCPE_NXM;
     M[addr] = val & DMASK;
+    g15_drum_wr(line, word, val);
 #endif
     return SCPE_OK;
 }
@@ -634,6 +656,8 @@ t_stat g15_cpu_examine(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
         return SCPE_NXM;
     if (vptr != NULL)
         *vptr = M[addr] & DMASK;
+    uin32_t val = g15_drum_rd(line, word);
+    *vptr = val;
 #endif
     return SCPE_OK;
 }
@@ -666,6 +690,12 @@ t_stat sim_instr(void)
         {
             reason = STOP_IBKPT;
             break;
+        }
+
+        // If there's an I/O operation pending, then handle it
+        if (false)
+        {
+            // TBD 
         }
 
         G15_CNTX * cntx = &g15_cpu_cntx;

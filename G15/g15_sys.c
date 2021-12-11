@@ -31,10 +31,12 @@ extern DEVICE g15_cpu_dev;
 extern REG    g15_cpu_reg[];
 extern DEVICE g15_an1_dev;
 extern DEVICE g15_at1_dev;
+extern DEVICE g15_bell_dev;
 extern DEVICE g15_ca1_dev;
 extern DEVICE g15_ca2_dev;
 extern DEVICE g15_ctl_dev;
 extern DEVICE g15_da1_dev;
+extern DEVICE g15_drum_dev;
 extern DEVICE g15_mta2_dev;
 extern DEVICE g15_pa3_dev;
 extern DEVICE g15_pr1_dev;
@@ -63,10 +65,12 @@ DEVICE *sim_devices[] =
 #if 0
     &g15_an1_dev,
     &g15_at1_dev,
+    &g15_bell_dev,
     &g15_ca1_dev,
     &g15_ca2_dev,
     &g15_ctl_dev,
     &g15_da1_dev,
+    &g15_drum_dev,
     &g15_mta2_dev,
     &g15_pa3_dev,
     &g15_pr1_dev,
@@ -99,3 +103,8 @@ t_stat parse_sym(CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 
     return SCPE_OK;
 }
 
+t_stat g15_cmd_test(void)
+{
+    g15_util_trace_enter(__FUNCTION__);
+    g15_util_trace_leave();
+}

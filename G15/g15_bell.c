@@ -1,16 +1,18 @@
-#include "g15_defs.h"
 #include <ctype.h>
+#include "g15_defs.h"
 
-UNIT g15_an1_unit =
+#include "sim_video.h"
+
+static UNIT g15_bell_unit =
 {
     next:            NULL,
-    action:          &g15_an1_svc,
+    action:          &g15_bell_svc,
     filename:        NULL,
     fileref:         NULL,
     filebuf:         NULL,
     hwmark:          0,
     time:            0,
-    flags:           UNIT_SEQ | UNIT_DISABLE,
+    flags:           UNIT_RO | UNIT_SEQ | UNIT_DISABLE,
     dynflags:        0,
     capac:           0,
     pos:             0,
@@ -34,60 +36,49 @@ UNIT g15_an1_unit =
     usecs_remaining: 0,
     uname:           NULL,
     dptr:            NULL,
-    dctrl:           0
-};
+    dctrl:           0};
 
-REG g15_an1_reg[] =
+REG g15_bell_reg[] =
 {
 };
 
-MTAB g15_an1_mod[] =
+MTAB g15_bell_mod[] =
 {
 };
 
-DEVICE g15_an1_dev =
+DEVICE g15_bell_dev =
 {
-    name:        "AN-1",
-    units:       &g15_an1_unit,
-    registers:   g15_an1_reg,
-    modifiers:   g15_an1_mod,
+    name:        "Bell",
+    units:       &g15_bell_unit,
+    registers:   g15_bell_reg,
+    modifiers:   g15_bell_mod,
     numunits:    1,
 };
 
-const char *g15_an1_desc(DEVICE *dptr)
+const char *g15_bell_desc(DEVICE *dptr)
 {
-    return "Alphanumeric Terminal";
+    return "Bell";
 }
 
-t_stat g15_an1_reset(DEVICE *dptr)
-{
-    g15_an1_unit.buf = 0;
-    sim_cancel(&g15_an1_unit);
-    return SCPE_OK;
-}
-
-t_stat g15_an1_svc(UNIT *uptr)
+t_stat g15_bell_svc(UNIT *uptr)
 {
     return SCPE_OK;
 }
 
-t_stat g15_an1_cmd(uint16_t cmd)
+t_stat g15_bell_reset(DEVICE *dptr)
+{
+    sim_cancel(&g15_bell_unit);
+    return SCPE_OK;
+}
+
+t_stat g15_bell_cmd(uint16_t cmd)
 {
     g15_util_trace_enter(__FUNCTION__);
     switch (cmd)
     {
-        case G15_AN1_CMD_PRINT_AR_N:
-            break;
-        case G15_AN1_CMD_PRINT_AR_A:
-            break;
-        case G15_AN1_CMD_PRINT_19_N:
-            break;
-        case G15_AN1_CMD_PRINT_19_A:
-            break;
-        case G15_AN1_CMD_TYPE_IN_N:
-            break;
-        case G15_AN1_CMD_TYPE_IN_A:
-            break;
+        case G15_BELL_CMD_RING:
+                vid_beep();
+                break;
         default:
             break;
     }

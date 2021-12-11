@@ -82,6 +82,8 @@ typedef struct
 
 uint32_t g15_util_i2w(G15_INST inst);
 G15_INST g15_util_w2i(uint32_t word);
+G15_INST g15_util_inst(uint8_t _P, uint16_t _L, uint16_t _N, uint8_t _C, uint16_t _S, uint16_t _D);
+
 void g15_util_trace_enter(const char * context);
 void g15_util_trace_leave(void);
 void g15_util_trace_print(const char * message);
@@ -93,12 +95,14 @@ typedef struct
     G15_STATE state;
     t_stat    reason;
     bool      halt;
-    uint32_t  PC;
-    uint32_t  AR;
-    uint32_t  ID;
-    uint32_t  MQ;
-    uint32_t  PN;
-    uint32_t  IP;
+    uint32_t  PC;        // PC (line:word)
+    uint32_t  AR;        // AR Register
+    uint32_t  ID;        // ID Register
+    uint32_t  MQ;        // MQ Register
+    uint32_t  PN;        // PN Register
+    uint32_t  IP;        // IP Register
+    uint32_t  IO;        // I/O Ready
+    uint32_t  OV;        // Overflow
 
 } G15_CNTX;
 
@@ -126,24 +130,54 @@ uint32_t g15_drum_rd(uint8_t line, uint8_t word);
 void     g15_drum_wr(uint8_t line, uint8_t word, uint32_t data);
 
 #define G15_AN1_CMD_TBD        0
+#define G15_AN1_CMD_PRINT_AR_N 1
+#define G15_AN1_CMD_PRINT_AR_A 2
+#define G15_AN1_CMD_PRINT_19_N 3
+#define G15_AN1_CMD_PRINT_19_A 4
+#define G15_AN1_CMD_TYPE_IN_A  5
+#define G15_AN1_CMD_TYPE_IN_N  6
 
 t_stat g15_an1_cmd(uint16_t cmd);
 
 #define G15_AT1_CMD_TBD        0
+#define G15_AT1_CMD_TBD        0
+#define G15_AT1_CMD_PRINT_AR_N 1
+#define G15_AT1_CMD_PRINT_AR_A 2
+#define G15_AT1_CMD_PRINT_19_N 3
+#define G15_AT1_CMD_PRINT_19_A 4
+#define G15_AT1_CMD_TYPE_IN_A  5
+#define G15_AT1_CMD_TYPE_IN_N  6
 
 t_stat g15_at1_cmd(uint16_t cmd);
 
+#define G15_BELL_CMD_RING      0
+
+t_stat g15_bell_cmd(uint16_t cmd);
+
 #define G15_CA1_CMD_TBD        0
+#define G15_CA1_CMD_READ       1
+#define G15_CA1_CMD_WRITE      2
 
 t_stat g15_ca1_cmd(uint16_t cmd);
 
 #define G15_CA2_CMD_TBD        0
+#define G15_CA2_CMD_READ       1
+#define G15_CA2_CMD_WRITE      2
 
 t_stat g15_ca2_cmd(uint16_t cmd);
+
+#define G15_CTL_CMD_TBD        0
+
+t_stat g15_ctl_cmd(uint16_t cmd);
 
 #define G15_DA1_CMD_TBD        0
 
 t_stat g15_da1_cmd(uint16_t cmd);
+
+#define G15_DRUM_CMD_TBD       0
+#define G15_DRUM_CMD_TBD       1
+
+t_stat g15_drum_cmd(uint16_t cmd);
 
 #define G15_MTA2_CMD_READ      0
 #define G15_MTA2_CMD_WRITE     1
@@ -153,20 +187,24 @@ t_stat g15_da1_cmd(uint16_t cmd);
 
 t_stat g15_mta2_cmd(uint16_t unit, uint16_t cmd);
 
-#define G15_PA3_CMD_READ       0
+#define G15_PA3_CMD_TBD        0
 
 t_stat g15_pa3_cmd(uint16_t cmd);
 
 #define G15_PR1_CMD_READ       0
+#define G15_PR1_CMD_REVERSE    1
 
 t_stat g15_pr1_cmd(uint16_t cmd);
 
 #define G15_PR2_CMD_READ       0
+#define G15_PR2_CMD_REVERSE    1
 
 t_stat g15_pr2_cmd(uint16_t cmd);
 
-#define G15_PTP1_CMD_WRITE     0
+#define G15_PTP1_CMD_PUNCH     0
+#define G15_PTP1_CMD_PUNCH_19  1
+#define G15_PTP1_CMD_TEST_SW   2
 
-t_stat g15_ptp1_cmd(uint16_t cmd);
+t_stat g15_ptp1_cmd(uint16_t cmd, uint8_t arg);
 
 #endif

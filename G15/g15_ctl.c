@@ -32,7 +32,7 @@
 
 static uint32_t g15_ctl_bits;
 
-UNIT g15_ctl_unit[] =
+static UNIT g15_ctl_unit =
 {
 };
 
@@ -47,7 +47,7 @@ MTAB g15_ctl_mod[] =
 DEVICE g15_ctl_dev =
 {
     name:        "CTL",
-    units:       g15_ctl_unit,
+    units:       &g15_ctl_unit,
     registers:   g15_ctl_reg,
     modifiers:   g15_ctl_mod,
     numunits:    1,
@@ -60,11 +60,21 @@ const char *g15_ctl_desc(DEVICE *dptr)
 
 t_stat g15_ctl_reset(DEVICE *dptr)
 {
-    sim_cancel(&g15_ctl_unit[0]);
+    sim_cancel(&g15_ctl_unit);
     return SCPE_OK;
 }
 
 t_stat g15_ctl_svc(UNIT *uptr)
 {
+    return SCPE_OK;
+}
+
+t_stat g15_ctl_cmd(uint16_t cmd)
+{
+    switch (cmd)
+    {
+        default:
+            break;
+    }
     return SCPE_OK;
 }

@@ -27,6 +27,20 @@ G15_INST g15_util_w2i(unsigned word)
     return inst;
 }
 
+G15_INST g15_util_inst(uint8_t _P, uint16_t _L, uint16_t _N, uint8_t _C, uint16_t _S, uint16_t _D)
+{
+    G15_INST inst =
+    {
+        P: _P,
+        L: _L,
+        N: _N,
+        C: _C,
+        S: _S,
+        D: _D
+    };
+    return inst;
+}
+
 void g15_util_trace_enter(const char * context)
 {
     sim_printf("%s\n", context);
