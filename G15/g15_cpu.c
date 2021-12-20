@@ -704,6 +704,14 @@ t_stat sim_instr(void)
         cntx->PC = PC_MAKE(PC_LINE(cntx->PC), inst.N);
         (*g15_cpu_dec[inst.S][inst.D])(cntx, inst);
 
+    if (sim_step != 0) {
+      if (--sim_step == 0)
+        return SCPE_STEP;
+    }
+
+    if (halt)
+      return STOP_HALT;
+
         if (cntx->halt)
         {
             reason = SCPE_STOP;
