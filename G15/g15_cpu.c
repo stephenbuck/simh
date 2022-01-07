@@ -518,6 +518,49 @@ static void z01(G15_CNTX * cntx, G15_INST inst)
     g15_util_trace_leave();
 }
 
+static void clr_dasm(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
+{
+    fprintf(of, "Clear multiplication and division registers");
+}
+
+static void cpy_dasm(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
+{
+    fprintf(of, "Transfer %s to %s", "TBD", "TBD");
+}
+
+static void hlt_dasm(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
+{
+    fprintf(of, "Halt");
+}
+
+static void ret_dasm(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
+{
+    fprintf(of, "Select command line and return");
+}
+
+static void tbd_dasm(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
+{
+    fprintf(of, "TBD");
+}
+
+static void tnz_dasm(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
+{
+    fprintf(of, "Test for non-zero");
+}
+
+typedef struct
+{
+    void (*exec)(G15_CNTX * cntx, G15_INST inst);
+    void (*dasm)(G15_CNTX * cntx, G15_INST inst, char * buff);
+
+} CMD;
+
+static CMD xclr = { exec: clr, dasm: clr_dasm };
+static CMD xcpy = { exec: cpy, dasm: cpy_dasm };
+static CMD xhlt = { exec: hlt, dasm: hlt_dasm };
+static CMD xret = { exec: ret, dasm: ret_dasm };
+static CMD xtbd = { exec: tbd, dasm: tbd_dasm };
+
 static G15_FUNC g15_cpu_dec[32][32] =
 {
     /*         DST                                     DST                                      DST                                     DST                                    */

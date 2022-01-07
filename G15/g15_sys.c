@@ -93,9 +93,26 @@ t_stat sim_load(FILE *fi, CONST char *cptr, CONST char *fnam, int flag)
     return SCPE_OK;
 }
 
+t_stat fprint_inst(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
+{
+    // table[][].dasm(of, addr, val, uptr, sw);
+    return SCPE_OK;
+}
+
+t_stat fprint_data(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
+{
+    // table[][].dasm(of, addr, val, uptr, sw);
+    return SCPE_OK;
+}
+
 t_stat fprint_sym(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
 {
-    return SCPE_OK;
+  if (sw & SWMASK('M'))
+    return fprint_inst(of, addr, val, uptr, sw);
+  else if (sw & SWMASK('D'))
+    return fprint_data(of, addr, val, uptr, sw);
+  else
+    return SCPE_ARG;
 }
 
 t_stat parse_sym(CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
