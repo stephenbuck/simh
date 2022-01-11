@@ -555,11 +555,20 @@ typedef struct
 
 } CMD;
 
+static CMD xtbd = { exec: tbd, dasm: tbd_dasm };
+static CMD xaar = { exec: aar, dasm: tbd_dasm };
+static CMD xadd = { exec: add, dasm: tbd_dasm };
 static CMD xclr = { exec: clr, dasm: clr_dasm };
 static CMD xcpy = { exec: cpy, dasm: cpy_dasm };
+static CMD xdvd = { exec: dvd, dasm: tbd_dasm };
+static CMD xfsr = { exec: fsr, dasm: tbd_dasm };
 static CMD xhlt = { exec: hlt, dasm: hlt_dasm };
+static CMD xmrk = { exec: mrk, dasm: tbd_dasm };
+static CMD xmul = { exec: mul, dasm: tbd_dasm };
 static CMD xret = { exec: ret, dasm: ret_dasm };
-static CMD xtbd = { exec: tbd, dasm: tbd_dasm };
+static CMD xtnz = { exec: tnz, dasm: tnz_dasm };
+static CMD xtov = { exec: tov, dasm: tbd_dasm };
+static CMD xtry = { exec: try, dasm: tbd_dasm };
 
 static G15_FUNC g15_cpu_dec[32][32] =
 {
