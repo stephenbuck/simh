@@ -39,23 +39,28 @@
 #define STOP_IBKPT      3      // Breakpoint 
 #define STOP_INVINS     4      // Invalid Instruction
 
-typedef enum {
+typedef enum
+{
     G15_STATE_READ_COMMAND,
     G15_STATE_WAIT_TO_EXECUTE,
     G15_STATE_EXECUTE,
     G15_STATE_WAIT_NEXT_COMMAND
+
 } G15_STATE;
 
-typedef enum {
-   PC,
-   AR,
-   ID,
-   PN,
-   MQ
+typedef enum
+{
+    PC,
+    AR,
+    ID,
+    PN,
+    MQ
+
 } G15_REGS;
 
 /*
-typedef struct {
+typedef struct
+{
     uint32_t ID:1;    // Immediate (0) or Deferred(1)
     uint32_t TL:7,    // Timing (Word or Duration)
     uint32_t BP:1,    // Breakpoint (1)
@@ -64,6 +69,7 @@ typedef struct {
     uint32_t S:5,     // Source
     uint32_t D:5,     // Destination
     uint32_t SD:1     // Single (0) or Double(1) Precision
+
 } G15_CMND;
 */
 
@@ -110,20 +116,26 @@ typedef struct
 #define G15_DRUM_LINES 20
 #define G15_DRUM_WORDS 108
 
-typedef struct {
+typedef struct
+{
     uint8_t line;
     uint8_t word;
+
 } G15_ADDR;
 
-typedef struct {
+typedef struct
+{
    char *   name;
    size_t   size;
    uint32_t flags;
    uint32_t words[G15_DRUM_WORDS];
+
 } G15_LINE;
 
-typedef struct {
+typedef struct
+{
    G15_LINE lines[G15_DRUM_LINES];
+
 } G15_DRUM;
 
 uint32_t g15_drum_rd(uint8_t line, uint8_t word);

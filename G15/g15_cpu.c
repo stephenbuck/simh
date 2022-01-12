@@ -9,11 +9,17 @@ t_stat g15_cpu_deposit(t_value val, t_addr addr, UNIT *uptr, int32 sw);
 t_stat g15_cpu_examine(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw);
 t_stat g15_cpu_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 
-typedef void (*G15_FUNC)(G15_CNTX * cntx, G15_INST inst);
 
 #define PC_MAKE(ln,wd) (((ln) << 16) | ((wd) << 0))
 #define PC_LINE(pc)    (((pc) & 0xffff0000) >> 16)
 #define PC_WORD(pc)    (((pc) & 0x0000ffff) >>  0)
+
+typedef struct
+{
+    void (*exec)(G15_CNTX * cntx, G15_INST inst);
+    void (*dasm)(G15_CNTX * cntx, G15_INST inst, char * buff);
+
+} G15_OPCODE;
 
 static G15_CNTX g15_cpu_cntx =
 {
@@ -30,14 +36,32 @@ static G15_CNTX g15_cpu_cntx =
     OV:     0
 };
 
-static void tbd(G15_CNTX * cntx, G15_INST inst)
+// ============================================================
+// tbd :
+// ============================================================
+
+static void tbd_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     cntx->reason = SCPE_UNK;
     g15_util_trace_leave();
 }
 
-static void aar(G15_CNTX * cntx, G15_INST inst)
+static void tbd_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE tbd =
+{
+    exec: tbd_exec,
+    dasm: tbd_dasm
+};
+
+// ============================================================
+// aar :
+// ============================================================
+
+static void aar_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     switch (G15_INST_PCHR(inst))
@@ -58,7 +82,21 @@ static void aar(G15_CNTX * cntx, G15_INST inst)
     g15_util_trace_leave();
 }
 
-static void add(G15_CNTX * cntx, G15_INST inst)
+static void aar_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE aar =
+{
+    exec: aar_exec,
+    dasm: aar_dasm
+};
+
+// ============================================================
+// add : Add
+// ============================================================
+
+static void add_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     switch (G15_INST_PCHR(inst))
@@ -86,8 +124,21 @@ static void add(G15_CNTX * cntx, G15_INST inst)
     g15_util_trace_leave();
 }
 
-// Clear multiplication and division registers
-static void clr(G15_CNTX * cntx, G15_INST inst)
+static void add_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE add =
+{
+    exec: add_exec,
+    dasm: add_dasm
+};
+
+// ============================================================
+// clr : Clear multiplication and division registers
+// ============================================================
+
+static void clr_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     cntx->ID = 0;
@@ -97,8 +148,21 @@ static void clr(G15_CNTX * cntx, G15_INST inst)
     g15_util_trace_leave();
 }
 
-// Transfer
-static void cpy(G15_CNTX * cntx, G15_INST inst)
+static void clr_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE clr =
+{
+    exec: clr_exec,
+    dasm: clr_dasm
+};
+
+// ============================================================
+// cpy : Copy
+// ============================================================
+
+static void cpy_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     switch (G15_INST_PCHR(inst))
@@ -114,112 +178,307 @@ static void cpy(G15_CNTX * cntx, G15_INST inst)
     g15_util_trace_leave();
 }
 
-// Divide
-static void dvd(G15_CNTX * cntx, G15_INST inst)
+static void cpy_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE cpy =
+{
+    exec: cpy_exec,
+    dasm: cpy_dasm
+};
+
+// ============================================================
+// dvd : Divide
+// ============================================================
+
+static void dvd_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_util_trace_leave();
 }
 
-// FSR
-static void fsr(G15_CNTX * cntx, G15_INST inst)
+static void dvd_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE dvd =
+{
+    exec: dvd_exec,
+    dasm: dvd_dasm
+};
+
+// ============================================================
+// fsr :
+// ============================================================
+
+static void fsr_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_util_trace_leave();
 }
 
-// Halt
-static void hlt(G15_CNTX * cntx, G15_INST inst)
+static void fsr_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE fsr =
+{
+    exec: fsr_exec,
+    dasm: fsr_dasm
+};
+
+// ============================================================
+// hlt : Halt
+// ============================================================
+
+static void hlt_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     cntx->halt = true;
     g15_util_trace_leave();
 }
 
-// Load to shift left
-static void ldl(G15_CNTX * cntx, G15_INST inst)
+static void hlt_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE hlt =
+{
+    exec: hlt_exec,
+    dasm: hlt_dasm
+};
+
+// ============================================================
+// ldl : Load to shift left
+// ============================================================
+
+static void ldl_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_util_trace_leave();
 }
 
-// Load numerator
-static void ldn(G15_CNTX * cntx, G15_INST inst)
+static void ldl_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE ldl =
+{
+    exec: ldl_exec,
+    dasm: ldl_dasm
+};
+
+// ============================================================
+// ldn : Load numerator
+// ============================================================
+
+static void ldn_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_util_trace_leave();
 }
 
-// Load to shift right
-static void ldr(G15_CNTX * cntx, G15_INST inst)
+static void ldn_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE ldn =
+{
+    exec: ldn_exec,
+    dasm: ldn_dasm
+};
+
+// ============================================================
+// ldr : Load to shift right
+// ============================================================
+
+static void ldr_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_util_trace_leave();
 }
 
-// Write file code on magnetic tape
-static void mfc(G15_CNTX * cntx, G15_INST inst)
+static void ldr_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE ldr =
+{
+    exec: ldr_exec,
+    dasm: ldr_dasm
+};
+
+// ============================================================
+// mfc : Write file code on magnetic tape
+// ============================================================
+
+static void mfc_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_mta2_cmd(inst.C, G15_MTA2_CMD_FILECODE);
     g15_util_trace_leave();
 }
 
-// Read magnetic tape
-static void mrd(G15_CNTX * cntx, G15_INST inst)
+static void mfc_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE mfc =
+{
+    exec: mfc_exec,
+    dasm: mfc_dasm
+};
+
+// ============================================================
+// mrd : Read magnetic tape
+// ============================================================
+
+static void mrd_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_mta2_cmd(inst.C, G15_MTA2_CMD_READ);
     g15_util_trace_leave();
 }
 
-// Select command line and mark
-static void mrk(G15_CNTX * cntx, G15_INST inst)
+static void mrd_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE mrd =
+{
+    exec: mrd_exec,
+    dasm: mrd_dasm
+};
+
+// ============================================================
+// mrk : Select command line and mark
+// ============================================================
+
+static void mrk_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_util_trace_leave();
 }
 
-// Search magnetic tape, forward
-static void msf(G15_CNTX * cntx, G15_INST inst)
+static void mrk_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE mrk =
+{
+    exec: mrk_exec,
+    dasm: mrk_dasm
+};
+
+// ============================================================
+// msf : Search magnetic tape, forward
+// ============================================================
+
+static void msf_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_mta2_cmd(inst.C, G15_MTA2_CMD_FORWARD);
     g15_util_trace_leave();
 }
 
-// Search magnetic tape, reverse
-static void msr(G15_CNTX * cntx, G15_INST inst)
+static void msf_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE msf =
+{
+    exec: msf_exec,
+    dasm: msf_dasm
+};
+
+// ============================================================
+// msr : Search magnetic tape, reverse
+// ============================================================
+
+static void msr_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_mta2_cmd(inst.C, G15_MTA2_CMD_REVERSE);
     g15_util_trace_leave();
 }
 
-// Multiply
-static void mul(G15_CNTX * cntx, G15_INST inst)
+static void msr_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE msr =
+{
+    exec: msr_exec,
+    dasm: msr_dasm
+};
+
+// ============================================================
+// mul : Multiply
+// ============================================================
+
+static void mul_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_util_trace_leave();
 }
 
-// Write on magnetic tape
-static void mwr(G15_CNTX * cntx, G15_INST inst)
+static void mul_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE mul =
+{
+    exec: mul_exec,
+    dasm: mul_dasm
+};
+
+// ============================================================
+// mwr : Write on magnetic tape
+// ============================================================
+
+static void mwr_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_mta2_cmd(inst.C, G15_MTA2_CMD_WRITE);
     g15_util_trace_leave();
 }
 
-// Normalize MQ
-static void nmq(G15_CNTX * cntx, G15_INST inst)
+static void mwr_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE mwr =
+{
+    exec: mwr_exec,
+    dasm: mwr_dasm
+};
+
+// ============================================================
+// nmq : Normalize MQ
+// ============================================================
+
+static void nmq_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_util_trace_leave();
 }
 
-// Print AR
-static void par(G15_CNTX * cntx, G15_INST inst)
+static void nmq_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE nmq =
+{
+    exec: nmq_exec,
+    dasm: nmq_dasm
+};
+
+// ============================================================
+// par : Print AR
+// ============================================================
+
+static void par_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     switch (G15_INST_PCHR(inst))
@@ -236,31 +495,83 @@ static void par(G15_CNTX * cntx, G15_INST inst)
     g15_util_trace_leave();
 }
 
-// Read punched cards
-static void pcr(G15_CNTX * cntx, G15_INST inst)
+static void par_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE par =
+{
+    exec: par_exec,
+    dasm: par_dasm
+};
+
+// ============================================================
+// pcr : Read punched cards
+// ============================================================
+
+static void pcr_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_ca1_cmd(G15_CA1_CMD_READ);
     g15_util_trace_leave();
 }
 
-// Write punched cards
-static void pcw(G15_CNTX * cntx, G15_INST inst)
+static void pcr_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE pcr =
+{
+    exec: pcr_exec,
+    dasm: pcr_dasm
+};
+
+// ============================================================
+// pcw : Write punched cards
+// ============================================================
+
+static void pcw_exec(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static void pcw_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_ca1_cmd(G15_CA1_CMD_WRITE);
     g15_util_trace_leave();
 }
 
-// Prepare product for addition in PN
-static void ppn(G15_CNTX * cntx, G15_INST inst)
+static G15_OPCODE pcw =
+{
+    exec: pcw_exec,
+    dasm: pcw_dasm
+};
+
+// ============================================================
+// ppn : Prepare product for addition in PN
+// ============================================================
+
+static void ppn_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_util_trace_leave();
 }
 
-// Print line 19
-static void pr9(G15_CNTX * cntx, G15_INST inst)
+static void ppn_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE ppn =
+{
+    exec: ppn_exec,
+    dasm: ppn_dasm
+};
+
+// ============================================================
+// pr9 : Print line 19
+// ============================================================
+
+static void pr9_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     switch (G15_INST_PCHR(inst))
@@ -277,8 +588,21 @@ static void pr9(G15_CNTX * cntx, G15_INST inst)
     g15_util_trace_leave();
 }
 
-// Permit type-in
-static void prm(G15_CNTX * cntx, G15_INST inst)
+static void pr9_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE pr9 =
+{
+    exec: pr9_exec,
+    dasm: pr9_dasm
+};
+
+// ============================================================
+// prm : Permit type-in
+// ============================================================
+
+static void prm_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     switch (G15_INST_PCHR(inst))
@@ -295,38 +619,103 @@ static void prm(G15_CNTX * cntx, G15_INST inst)
     g15_util_trace_leave();
 }
 
-// Punch line 19 on tape
-static void pt9(G15_CNTX * cntx, G15_INST inst)
+static void prm_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE prm =
+{
+    exec: prm_exec,
+    dasm: prm_dasm
+};
+
+// ============================================================
+// pt9 : Punch line 19 on tape
+// ============================================================
+
+static void pt9_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_ptp1_cmd(G15_PTP1_CMD_PUNCH_19);
     g15_util_trace_leave();
 }
 
-// TBD
-static void ptb(G15_CNTX * cntx, G15_INST inst)
+static void pt9_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE pt9 =
+{
+    exec: pt9_exec,
+    dasm: pt9_dasm
+};
+
+// ============================================================
+// ptb :
+// ============================================================
+
+static void ptb_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_util_trace_leave();
 }
 
-// Reverse punched tape
-static void ptr(G15_CNTX * cntx, G15_INST inst)
+static void ptb_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE ptb =
+{
+    exec: ptb_exec,
+    dasm: ptb_dasm
+};
+
+// ============================================================
+// ptr : Reverse punched tape
+// ============================================================
+
+static void ptr_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_pr1_cmd(G15_PR1_CMD_REVERSE);
     g15_util_trace_leave();
 }
 
-// Select command line and return
-static void ret(G15_CNTX * cntx, G15_INST inst)
+static void ptr_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE ptr =
+{
+    exec: ptr_exec,
+    dasm: ptr_dasm
+};
+
+// ============================================================
+// ret : Select command line and return
+// ============================================================
+
+static void ret_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_util_trace_leave();
 }
 
-// Shift MQ
-static void smq(G15_CNTX * cntx, G15_INST inst)
+static void ret_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE ret =
+{
+    exec: ret_exec,
+    dasm: ret_dasm
+};
+
+// ============================================================
+// smq : Shift MQ
+// ============================================================
+
+static void smq_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     switch (G15_INST_PCHR(inst))
@@ -341,8 +730,21 @@ static void smq(G15_CNTX * cntx, G15_INST inst)
     g15_util_trace_leave();
 }
 
-// Special
-static void spc(G15_CNTX * cntx, G15_INST inst)
+static void smq_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE smq =
+{
+    exec: smq_exec,
+    dasm: smq_dasm
+};
+
+// ============================================================
+// spc : Special
+// ============================================================
+
+static void spc_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     switch (G15_INST_PCHR(inst))
@@ -359,37 +761,103 @@ static void spc(G15_CNTX * cntx, G15_INST inst)
     g15_util_trace_leave();
 }
 
-// Store sum or difference from AR
-static void sta(G15_CNTX * cntx, G15_INST inst)
+static void spc_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE spc =
+{
+    exec: spc_exec,
+    dasm: spc_dasm
+};
+
+// ============================================================
+// sta : Store sum or difference from AR
+// ============================================================
+
+static void sta_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_drum_wr(inst.L, inst.D, cntx->AR);
     g15_util_trace_leave();
 }
 
-// Store product
-static void stp(G15_CNTX * cntx, G15_INST inst)
+static void sta_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE sta =
+{
+    exec: sta_exec,
+    dasm: sta_dasm
+};
+
+// ============================================================
+// stp : Store product
+// ============================================================
+
+static void stp_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_util_trace_leave();
 }
 
-// Store quotient
-static void stq(G15_CNTX * cntx, G15_INST inst)
+static void stp_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE stp =
+{
+    exec: stp_exec,
+    dasm: stp_dasm
+};
+
+// ============================================================
+// stq : Store quotient
+// ============================================================
+
+static void stq_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_util_trace_leave();
 }
 
-// Test if sign of AR negative
-static void tng(G15_CNTX * cntx, G15_INST inst)
+static void stq_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE stq =
+{
+    exec: stq_exec,
+    dasm: stq_dasm
+};
+
+// ============================================================
+// tng : Test if sign of AR negative
+// ============================================================
+
+static void tng_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     if (cntx->AR < 0) cntx->PC = PC_MAKE(PC_LINE(cntx->PC), inst.N + 1);
     g15_util_trace_leave();
 }
 
-static void z02(G15_CNTX * cntx, G15_INST inst)
+static void tng_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE tng =
+{
+    exec: tng_exec,
+    dasm: tng_dasm
+};
+
+// ============================================================
+// z02 :
+// ============================================================
+
+static void z02_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     switch (G15_INST_PCHR(inst))
@@ -419,7 +887,21 @@ static void z02(G15_CNTX * cntx, G15_INST inst)
     g15_util_trace_leave();
 }
 
-static void z03(G15_CNTX * cntx, G15_INST inst)
+static void z02_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE z02 =
+{
+    exec: z02_exec,
+    dasm: z02_dasm
+};
+
+// ============================================================
+// z03 :
+// ============================================================
+
+static void z03_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     switch (G15_INST_PCHR(inst))
@@ -440,51 +922,144 @@ static void z03(G15_CNTX * cntx, G15_INST inst)
     g15_util_trace_leave();
 }
 
-// Test for non-zero
-static void tnz(G15_CNTX * cntx, G15_INST inst)
+static void z03_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE z03 =
+{
+    exec: z03_exec,
+    dasm: z03_dasm
+};
+
+// ============================================================
+// tnz : Test for non-zero
+// ============================================================
+
+static void tnz_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     if (cntx->AR != 0) cntx->PC = PC_MAKE(PC_LINE(cntx->PC), inst.N + 1);
     g15_util_trace_leave();
 }
 
-// Test for overflow
-static void tov(G15_CNTX * cntx, G15_INST inst)
+static void tnz_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE tnz =
+{
+    exec: tnz_exec,
+    dasm: tnz_dasm
+};
+
+// ============================================================
+// tov : Test for overflow
+// ============================================================
+
+static void tov_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     if (cntx->OV != 0) cntx->PC = PC_MAKE(PC_LINE(cntx->PC), inst.N + 1);
     g15_util_trace_leave();
 }
 
-// Test "ready" state of input/output
-static void try(G15_CNTX * cntx, G15_INST inst)
+static void tov_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE tov =
+{
+    exec: tov_exec,
+    dasm: tov_dasm
+};
+
+// ============================================================
+// try : Test "ready" state of input/output
+// ============================================================
+
+static void try_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     if (cntx->IO != 0) cntx->PC = PC_MAKE(PC_LINE(cntx->PC), inst.N + 1);
     g15_util_trace_leave();
 }
 
-// TBD
-static void tsr(G15_CNTX * cntx, G15_INST inst)
+static void try_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE try =
+{
+    exec: try_exec,
+    dasm: try_dasm
+};
+
+// ============================================================
+// tsr :
+// ============================================================
+
+static void tsr_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_util_trace_leave();
 }
 
-static void xt0(G15_CNTX * cntx, G15_INST inst)
+static void tsr_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE tsr =
+{
+    exec: tsr_exec,
+    dasm: tsr_dasm
+};
+
+// ============================================================
+// xt0 :
+// ============================================================
+
+static void xt0_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_util_trace_leave();
 }
 
-static void xt1(G15_CNTX * cntx, G15_INST inst)
+static void xt0_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE xt0 =
+{
+    exec: xt0_exec,
+    dasm: xt0_dasm
+};
+
+// ============================================================
+// xt1 :
+// ============================================================
+
+static void xt1_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     g15_util_trace_leave();
 }
 
-// Special 00
-static void z00(G15_CNTX * cntx, G15_INST inst)
+static void xt1_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE xt1 =
+{
+    exec: xt1_exec,
+    dasm: xt1_dasm
+};
+
+// ============================================================
+// z00 : Special 00
+// ============================================================
+
+static void z00_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     switch (G15_INST_PCHR(inst))
@@ -500,8 +1075,21 @@ static void z00(G15_CNTX * cntx, G15_INST inst)
     g15_util_trace_leave();
 }
 
-// Special 01
-static void z01(G15_CNTX * cntx, G15_INST inst)
+static void z00_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE z00 =
+{
+    exec: z00_exec,
+    dasm: z00_dasm
+};
+
+// ============================================================
+// z01 : Special 01
+// ============================================================
+
+static void z01_exec(G15_CNTX * cntx, G15_INST inst)
 {
     g15_util_trace_enter(__FUNCTION__);
     switch (G15_INST_PCHR(inst))
@@ -518,6 +1106,20 @@ static void z01(G15_CNTX * cntx, G15_INST inst)
     g15_util_trace_leave();
 }
 
+static void z01_dasm(G15_CNTX * cntx, G15_INST inst)
+{
+}
+
+static G15_OPCODE z01 =
+{
+    exec: z01_exec,
+    dasm: z01_dasm
+};
+
+
+
+
+#if 0
 static void clr_dasm(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
 {
     fprintf(of, "Clear multiplication and division registers");
@@ -547,30 +1149,9 @@ static void tnz_dasm(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
 {
     fprintf(of, "Test for non-zero");
 }
+#endif
 
-typedef struct
-{
-    void (*exec)(G15_CNTX * cntx, G15_INST inst);
-    void (*dasm)(G15_CNTX * cntx, G15_INST inst, char * buff);
-
-} CMD;
-
-static CMD xtbd = { exec: tbd, dasm: tbd_dasm };
-static CMD xaar = { exec: aar, dasm: tbd_dasm };
-static CMD xadd = { exec: add, dasm: tbd_dasm };
-static CMD xclr = { exec: clr, dasm: clr_dasm };
-static CMD xcpy = { exec: cpy, dasm: cpy_dasm };
-static CMD xdvd = { exec: dvd, dasm: tbd_dasm };
-static CMD xfsr = { exec: fsr, dasm: tbd_dasm };
-static CMD xhlt = { exec: hlt, dasm: hlt_dasm };
-static CMD xmrk = { exec: mrk, dasm: tbd_dasm };
-static CMD xmul = { exec: mul, dasm: tbd_dasm };
-static CMD xret = { exec: ret, dasm: ret_dasm };
-static CMD xtnz = { exec: tnz, dasm: tnz_dasm };
-static CMD xtov = { exec: tov, dasm: tbd_dasm };
-static CMD xtry = { exec: try, dasm: tbd_dasm };
-
-static G15_FUNC g15_cpu_dec[32][32] =
+static G15_OPCODE * g15_cpu_dec[32][32] =
 {
     /*         DST                                     DST                                      DST                                     DST                                    */
     /* SRC     000, 001, 002, 003, 004, 005, 006, 007  008, 009, 010, 011, 012, 013, 014, 015   016, 017, 018, 019, 020, 021, 022, 023  024, 025, 026, 027, 028, 029, 030, 031 */
